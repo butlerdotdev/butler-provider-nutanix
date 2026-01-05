@@ -1,0 +1,26 @@
+# Binaries
+bin/
+dist/
+
+# Git
+.git
+.gitignore
+
+# IDE
+.idea
+.vscode
+
+# Test artifacts
+cover.out
+*.test
+
+# Docker
+Dockerfile.cross
+
+# Docs
+docs/
+*.md
+!README.md
+
+# Build artifacts
+Dockerfile.cross
