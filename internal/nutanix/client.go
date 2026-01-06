@@ -150,14 +150,15 @@ func (c *Client) CreateVM(ctx context.Context, opts VMCreateOptions) (string, er
 		return "", fmt.Errorf("failed to decode create response: %w", err)
 	}
 
-	// If we got the UUID directly, return it
-	if createResp.Metadata.UUID != "" {
-		return createResp.Metadata.UUID, nil
-	}
-
-	// Otherwise wait for the task to complete
+	// Always wait for the task to complete - metadata.uuid is returned immediately
+	// but the VM isn't ready until the task finishes
 	if createResp.Status.ExecutionContext.TaskUUID != "" {
 		return c.waitForTask(ctx, createResp.Status.ExecutionContext.TaskUUID)
+	}
+
+	// Fall back to metadata UUID only if no task (shouldn't happen for create)
+	if createResp.Metadata.UUID != "" {
+		return createResp.Metadata.UUID, nil
 	}
 
 	return "", fmt.Errorf("no UUID or task UUID in create response")
@@ -206,8 +207,6 @@ func (c *Client) buildVMSpec(opts VMCreateOptions, imageUUID string) map[string]
 		"disk_list":            diskList,
 	}
 
-	// Only add guest_customization if UserData is provided
-	// NOTE: Talos does not use cloud-init - it gets configured via Talos API
 	if opts.UserData != "" {
 		cloudInitConfig := map[string]interface{}{
 			"user_data": opts.UserData,
