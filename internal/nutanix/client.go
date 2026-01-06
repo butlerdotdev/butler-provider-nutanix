@@ -110,6 +110,11 @@ type VMInfo struct {
 
 // CreateVM creates a new VM in Nutanix.
 func (c *Client) CreateVM(ctx context.Context, opts VMCreateOptions) (string, error) {
+	fmt.Printf("DEBUG CreateVM called: Name=%q CPU=%d MemoryMB=%d DiskGB=%d\n",
+		opts.Name, opts.CPU, opts.MemoryMB, opts.DiskGB)
+	fmt.Printf("DEBUG Config: Endpoint=%q ClusterUUID=%q SubnetUUID=%q ImageUUID=%q\n",
+		c.config.Endpoint, c.config.ClusterUUID, c.config.SubnetUUID, c.config.ImageUUID)
+
 	// Use image from options or fall back to config default
 	imageUUID := opts.ImageUUID
 	if imageUUID == "" {
@@ -437,6 +442,7 @@ func (c *Client) doRequest(ctx context.Context, method, path string, body interf
 		if err != nil {
 			return nil, fmt.Errorf("failed to marshal request body: %w", err)
 		}
+		fmt.Printf("DEBUG REQUEST %s %s: %s\n", method, url, string(jsonBody))
 		reqBody = bytes.NewReader(jsonBody)
 	}
 
