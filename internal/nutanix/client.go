@@ -178,7 +178,7 @@ func (c *Client) buildVMSpec(opts VMCreateOptions, imageUUID string) map[string]
 		},
 	}
 
-	// Build disk list
+	// Build disk list - just the boot disk from image
 	diskList := []map[string]interface{}{
 		{
 			"device_properties": map[string]interface{}{
@@ -196,7 +196,18 @@ func (c *Client) buildVMSpec(opts VMCreateOptions, imageUUID string) map[string]
 		},
 	}
 
-	// Add cloud-init disk if userdata provided
+	// Build resources spec
+	resources := map[string]interface{}{
+		"num_sockets":          1,
+		"num_vcpus_per_socket": opts.CPU,
+		"memory_size_mib":      opts.MemoryMB,
+		"power_state":          "ON",
+		"nic_list":             nicList,
+		"disk_list":            diskList,
+	}
+
+	// Only add guest_customization if UserData is provided
+	// NOTE: Talos does not use cloud-init - it gets configured via Talos API
 	if opts.UserData != "" {
 		cloudInitConfig := map[string]interface{}{
 			"user_data": opts.UserData,
@@ -204,17 +215,9 @@ func (c *Client) buildVMSpec(opts VMCreateOptions, imageUUID string) map[string]
 		if opts.NetworkData != "" {
 			cloudInitConfig["meta_data"] = opts.NetworkData
 		}
-
-		diskList = append(diskList, map[string]interface{}{
-			"device_properties": map[string]interface{}{
-				"device_type": "CDROM",
-				"disk_address": map[string]interface{}{
-					"adapter_type": "IDE",
-					"device_index": 0,
-				},
-			},
-			"disk_size_bytes": 1048576, // 1MB for cloud-init
-		})
+		resources["guest_customization"] = map[string]interface{}{
+			"cloud_init": cloudInitConfig,
+		}
 	}
 
 	spec := map[string]interface{}{
@@ -223,20 +226,8 @@ func (c *Client) buildVMSpec(opts VMCreateOptions, imageUUID string) map[string]
 			"kind": "vm",
 		},
 		"spec": map[string]interface{}{
-			"name": opts.Name,
-			"resources": map[string]interface{}{
-				"num_sockets":           1,
-				"num_vcpus_per_socket":  opts.CPU,
-				"memory_size_mib":       opts.MemoryMB,
-				"power_state":           "ON",
-				"nic_list":              nicList,
-				"disk_list":             diskList,
-				"guest_customization": map[string]interface{}{
-					"cloud_init": map[string]interface{}{
-						"user_data": opts.UserData,
-					},
-				},
-			},
+			"name":      opts.Name,
+			"resources": resources,
 			"cluster_reference": map[string]interface{}{
 				"kind": "cluster",
 				"uuid": c.config.ClusterUUID,
@@ -406,8 +397,8 @@ func (c *Client) waitForTask(ctx context.Context, taskUUID string) (string, erro
 			}
 
 			var taskResp struct {
-				Status             string `json:"status"`
-				ProgressMessage    string `json:"progress_message"`
+				Status              string `json:"status"`
+				ProgressMessage     string `json:"progress_message"`
 				EntityReferenceList []struct {
 					Kind string `json:"kind"`
 					UUID string `json:"uuid"`
