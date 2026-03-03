@@ -5,7 +5,7 @@ go 1.24.6
 toolchain go1.24.11
 
 require (
-	github.com/butlerdotdev/butler-api v0.4.1-0.20260228030305-140667362f7c
+	github.com/butlerdotdev/butler-api v0.5.0
 	github.com/onsi/ginkgo/v2 v2.22.0
 	github.com/onsi/gomega v1.36.1
 	k8s.io/api v0.34.1
