@@ -1,6 +1,26 @@
-# Butler Provider Nutanix
+<p align="center">
+  <img src="https://raw.githubusercontent.com/butlerdotdev/butler/main/assets/mascots/butler.png" alt="Butler" width="150"/>
+</p>
 
-Nutanix AHV infrastructure provider for Butler. This controller handles `MachineRequest` CRs for Nutanix Prism Central.
+<h1 align="center">Butler Provider: Nutanix</h1>
+
+<p align="center">
+  Nutanix AHV infrastructure provider for the <a href="https://github.com/butlerdotdev/butler">Butler</a> platform.
+</p>
+
+<p align="center">
+  <a href="https://github.com/butlerdotdev/butler-provider-nutanix/releases"><img src="https://img.shields.io/github/v/release/butlerdotdev/butler-provider-nutanix" alt="Release"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/butlerdotdev/butler-provider-nutanix" alt="License"></a>
+  <img src="https://img.shields.io/github/go-mod/go-version/butlerdotdev/butler-provider-nutanix" alt="Go Version">
+</p>
+
+<p align="center">
+  <a href="https://github.com/butlerdotdev/butler">Butler</a> · <a href="https://docs.butlerlabs.dev">Docs</a> · <a href="https://butlerlabs.dev">Website</a>
+</p>
+
+---
+
+This controller handles `MachineRequest` CRs for Nutanix Prism Central.
 
 ## Overview
 
